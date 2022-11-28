@@ -37,6 +37,11 @@ namespace Cysharp.Collections.Allocation
             {
                 unsafe
                 {
+                    var  chunks = 
+                    for (int i = 0; i < length; i++)
+                    {
+
+                    }
                     new Span<byte>(ptr.ToPointer(), (int)size).Fill(0);
                 }
             }
