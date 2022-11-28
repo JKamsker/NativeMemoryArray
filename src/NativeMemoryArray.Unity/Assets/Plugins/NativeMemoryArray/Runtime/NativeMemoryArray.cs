@@ -23,6 +23,8 @@ namespace Cysharp.Collections
 
         public long Length => length;
 
+        public IntPtr DataPointer => (IntPtr)buffer;
+
         static NativeMemoryArray()
         {
             Empty = new NativeMemoryArray<T>(0);
@@ -258,24 +260,26 @@ namespace Cysharp.Collections
 
         void DisposeCore()
         {
-            if (!isDisposed)
+            if (isDisposed)
             {
-                isDisposed = true;
+                return;
+            }
+            
+            isDisposed = true;
 #if UNITY_2019_1_OR_NEWER
-                if (buffer == null) return;
+            if (buffer == null) return;
 #else
-                if (Unsafe.IsNullRef(ref Unsafe.AsRef<byte>(buffer))) return;
+            if (Unsafe.IsNullRef(ref Unsafe.AsRef<byte>(buffer))) return;
 #endif
 
 #if NET6_0_OR_GREATER
-                NativeMemory.Free(buffer);
+            NativeMemory.Free(buffer);
 #else
-                Marshal.FreeHGlobal((IntPtr)buffer);
+            Marshal.FreeHGlobal((IntPtr)buffer);
 #endif
-                if (addMemoryPressure)
-                {
-                    GC.RemoveMemoryPressure(length * Unsafe.SizeOf<T>());
-                }
+            if (addMemoryPressure)
+            {
+                GC.RemoveMemoryPressure(length * Unsafe.SizeOf<T>());
             }
         }
 

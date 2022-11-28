@@ -4,7 +4,23 @@ using System.IO.Pipelines;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 using Cysharp.Collections;
+
+
+
+unsafe
+{
+    var buffer = new NativeMemoryArray<Dummy>(200);
+    //var ptr = (IntPtr)buffer.GetPinnableReference();
+
+    var ptr = (IntPtr)Unsafe.AsPointer(ref buffer.GetPinnableReference());
+
+    fixed (Dummy* p = &buffer[0])
+    {
+        p->Yolo1 = 50;
+    }
+}
 
 
 var yaki = new NativeMemoryArray<int>(100);
@@ -49,3 +65,12 @@ var b = bin2.AsReadOnlyMemoryList();
 
 Console.WriteLine(a[0].Span.SequenceEqual(b[0].Span));
 Console.WriteLine(a[1].Span.SequenceEqual(b[1].Span));
+
+
+struct Dummy
+{
+    public int Yolo1;
+    public int Yolo2;
+    public int Yolo3;
+
+}
